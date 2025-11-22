@@ -1,0 +1,22 @@
+[
+  {
+    "code": "HS001",
+    "name": "Nguyễn Văn A",
+    "grades": [
+      { "subject": "Toán", "score": 8.5 },
+      { "subject": "Văn", "score": 7.0 },
+      { "subject": "Anh", "score": 9.0 }
+    ],
+    "comments": "Học sinh chăm chỉ, cần cải thiện kỹ năng làm bài."
+  },
+  {
+    "code": "HS002",
+    "name": "Trần Thị B",
+    "grades": [
+      { "subject": "Toán", "score": 9.2 },
+      { "subject": "Văn", "score": 8.5 },
+      { "subject": "Anh", "score": 8.8 }
+    ],
+    "comments": "Học sinh xuất sắc, tiếp tục phát huy."
+  }
+]

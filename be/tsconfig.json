@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* 1. Cấu hình Module chuẩn cho Node.js (Fix lỗi phải thêm đuôi .js) */
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "lib": ["ES2020"], 
+
+    /* 2. Đường dẫn file (Fix lỗi không tìm thấy file) */
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    /* 3. Tương thích thư viện */
+    "esModuleInterop": true,        // Quan trọng để import express, cors...
+    "resolveJsonModule": true,      // Cho phép import file .json
+    "skipLibCheck": true,           // Bỏ qua lỗi trong node_modules
+    "forceConsistentCasingInFileNames": true,
+
+    /* 4. Kiểm tra code */
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

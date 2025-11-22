@@ -1,0 +1,100 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber     String   @unique
+  password        String
+  fullName        String
+  managedClassIds String[] @db.ObjectId
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("teachers")
+}
+
+model Admin {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber  String   @unique
+  password     String
+  fullName     String
+  isSuperAdmin Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@map("admins")
+}
+
+model Class {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  className  String
+  schoolYear String
+  teacherIds String[]  @db.ObjectId
+  isActive   Boolean   @default(true)
+
+  students   Student[]
+  reports    Report[]
+
+  @@unique([className, schoolYear])
+  @@map("classes")
+}
+
+model Student {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentCode  String   @unique
+  fullName     String
+  classId      String   @db.ObjectId
+  parentPhones String[]
+  gender       String?
+  dateOfBirth  DateTime?
+
+  class   Class    @relation(fields: [classId], references: [id])
+  reports Report[]
+
+  @@index([parentPhones])
+  @@index([classId])
+  @@map("students")
+}
+
+model Report {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  studentId      String    @db.ObjectId
+  classId        String    @db.ObjectId
+  term           String
+  grades         Grade[]
+  generalComment String?
+  createdBy      String    @db.ObjectId
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+  class   Class   @relation(fields: [classId], references: [id])
+
+  @@index([studentId, term(sort: Desc)])
+  @@index([classId, term(sort: Desc)])
+  @@map("reports")
+}
+
+type Grade {
+  subject String
+  score   Float
+  comment String?
+}
+
+model Otp {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  phoneNumber String
+  hashedOtp   String
+  attempts    Int      @default(0)
+  expiresAt   DateTime
+
+  @@index([phoneNumber])
+  @@map("otps")
+}
