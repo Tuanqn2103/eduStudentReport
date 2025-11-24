@@ -1,23 +1,35 @@
-import app from "./app";
-import connectDB from "./config/database";
-import dotenv from "dotenv";
-import {
-  createClassReport,
-  updateStudentReport,
-  getClassReport
-} from './controllers/report.controller';
-import { teacherAuth } from './middlewares/auth.teacher';
+// src/server.ts
+import dotenv from 'dotenv';
+import app from './app'; // Import app đã cấu hình routes ở trên
+import { prisma } from './lib/prisma'; // Kết nối Prisma (cho Admin)
+import connectDB from './config/database'; // Kết nối Mongoose (cho Teacher cũ)
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
-connectDB();
+const startServer = async () => {
+  try {
+    console.log("⏳ Đang khởi động hệ thống...");
 
-app.post('/api/teacher/reports/create', teacherAuth, createClassReport);
-app.put('/api/teacher/reports/:reportId', teacherAuth, updateStudentReport);
-app.get('/api/teacher/reports/class', teacherAuth, getClassReport);
+    // 1. Kết nối MongoDB (Mongoose) - Dùng cho chức năng Teacher cũ
+    await connectDB(); 
+    
+    // 2. Kết nối Prisma - Dùng cho Admin mới
+    await prisma.$connect();
+    console.log("✅ Connected to MongoDB via Prisma");
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+    // 3. Chạy Server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`   - Admin API: http://localhost:${PORT}/api/admin/auth`);
+      console.log(`   - Teacher API: http://localhost:${PORT}/api/teacher/reports`);
+    });
+
+  } catch (error) {
+    console.error("❌ Server startup failed:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

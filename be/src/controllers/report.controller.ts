@@ -11,12 +11,13 @@ declare global {
 }
 
 // 1. Tạo bảng điểm mới cho cả lớp
-export const createClassReport = async (req: Request, res: Response) => {
+export const createClassReport = async (req: Request, res: Response): Promise<void> => {
   const teacherId = req.user.id;
   const { classId, term } = req.body;
 
   if (!classId || !term) {
-    return res.status(400).json({ message: 'Thiếu thông tin lớp hoặc kỳ học' });
+    res.status(400).json({ message: 'Thiếu thông tin lớp hoặc kỳ học' });
+    return;
   }
 
   // Kiểm tra quyền giáo viên
@@ -27,14 +28,20 @@ export const createClassReport = async (req: Request, res: Response) => {
     },
   });
 
-  if (!classInfo) return res.status(403).json({ message: 'Bạn không chủ nhiệm lớp này' });
+  if (!classInfo) {
+    res.status(403).json({ message: 'Bạn không chủ nhiệm lớp này' });
+    return;
+  }
 
   // Kiểm tra bảng điểm đã tồn tại chưa
   const existed = await prisma.report.findFirst({
     where: { classId, term },
   });
-  
-  if (existed) return res.status(400).json({ message: 'Kỳ này đã được tạo rồi' });
+
+  if (existed) {
+    res.status(400).json({ message: 'Kỳ này đã được tạo rồi' });
+    return;
+  }
 
   // Lấy danh sách học sinh
   const students = await prisma.student.findMany({
@@ -43,7 +50,8 @@ export const createClassReport = async (req: Request, res: Response) => {
   });
 
   if (students.length === 0) {
-    return res.status(400).json({ message: 'Lớp này chưa có học sinh nào' });
+    res.status(400).json({ message: 'Lớp này chưa có học sinh nào' });
+    return;
   }
 
   // Tạo report cho từng học sinh
@@ -62,14 +70,15 @@ export const createClassReport = async (req: Request, res: Response) => {
 };
 
 // 2. Cập nhật điểm cho 1 học sinh
-export const updateStudentReport = async (req: Request, res: Response) => {
+export const updateStudentReport = async (req: Request, res: Response): Promise<void> => {
   const teacherId = req.user.id;
   const { reportId } = req.params;
   const { grades, generalComment } = req.body;
 
   // FIX LỖI 1: Kiểm tra reportId tồn tại
   if (!reportId) {
-    return res.status(400).json({ message: 'Thiếu Report ID' });
+    res.status(400).json({ message: 'Thiếu Report ID' });
+    return;
   }
 
   // Tìm báo cáo (Không dùng include class để tránh lỗi property 'class')
@@ -77,7 +86,10 @@ export const updateStudentReport = async (req: Request, res: Response) => {
     where: { id: reportId },
   });
 
-  if (!report) return res.status(404).json({ message: 'Không tìm thấy bảng điểm' });
+  if (!report) {
+    res.status(404).json({ message: 'Không tìm thấy bảng điểm' });
+    return;
+  }
 
   const classInfo = await prisma.class.findUnique({
     where: { id: report.classId },
@@ -88,7 +100,8 @@ export const updateStudentReport = async (req: Request, res: Response) => {
   const isClassTeacher = classInfo?.teacherIds.includes(teacherId) ?? false;
 
   if (!isOwner && !isClassTeacher) {
-    return res.status(403).json({ message: 'Không có quyền sửa' });
+    res.status(403).json({ message: 'Không có quyền sửa' });
+    return;
   }
 
   // Cập nhật
@@ -107,7 +120,7 @@ export const updateStudentReport = async (req: Request, res: Response) => {
 };
 
 // 3. Xem bảng điểm cả lớp
-export const getClassReport = async (req: Request, res: Response) => {
+export const getClassReport = async (req: Request, res: Response): Promise<void> => {
   const teacherId = req.user.id;
   
   // Ép kiểu về string để tránh lỗi type undefined
@@ -115,7 +128,8 @@ export const getClassReport = async (req: Request, res: Response) => {
   const term = req.query.term as string;
 
   if (!classId || !term) {
-    return res.status(400).json({ message: 'Vui lòng chọn lớp và kỳ học' });
+    res.status(400).json({ message: 'Vui lòng chọn lớp và kỳ học' });
+    return;
   }
 
   const classInfo = await prisma.class.findFirst({
@@ -125,7 +139,10 @@ export const getClassReport = async (req: Request, res: Response) => {
     },
   });
 
-  if (!classInfo) return res.status(403).json({ message: 'Không chủ nhiệm lớp này' });
+  if (!classInfo) {
+    res.status(403).json({ message: 'Không chủ nhiệm lớp này' });
+    return;
+  }
 
   const reports = await prisma.report.findMany({
     where: { classId, term },

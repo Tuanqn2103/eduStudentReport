@@ -1,16 +1,22 @@
-// src/app.ts
 import express from 'express';
 import cors from 'cors';
+import adminAuthRoutes from './routes/admin.auth.routes';
+import teacherReportRoutes from './routes/teacher.report.routes';
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Test route
-app.get('/', (req, res) => {
-  res.send('API EduStudentReports is running...');
+app.use((req, res, next) => {
+  console.log(`👉 LOG REQUEST: [${req.method}] ${req.url}`);
+  next();
 });
+app.get('/', (req, res) => {
+  res.json({ message: 'Backend API for EduStudentReports is running' });
+});
+
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/teacher/reports', teacherReportRoutes); 
+
 
 export default app;
