@@ -38,7 +38,6 @@ model Class {
   schoolYear String
   teacherIds String[]  @db.ObjectId
   isActive   Boolean   @default(true)
-
   students   Student[]
   reports    Report[]
 
@@ -52,6 +51,7 @@ model Student {
   fullName     String
   classId      String   @db.ObjectId
   parentPhones String[]
+  parentPin   String?
   gender       String?
   dateOfBirth  DateTime?
 
@@ -73,6 +73,7 @@ model Report {
   createdBy      String    @db.ObjectId
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  isViewed       Boolean   @default(false)
 
   student Student @relation(fields: [studentId], references: [id])
   class   Class   @relation(fields: [classId], references: [id])
@@ -86,15 +87,4 @@ type Grade {
   subject String
   score   Float
   comment String?
-}
-
-model Otp {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  phoneNumber String
-  hashedOtp   String
-  attempts    Int      @default(0)
-  expiresAt   DateTime
-
-  @@index([phoneNumber])
-  @@map("otps")
 }

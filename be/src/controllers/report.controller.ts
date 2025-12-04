@@ -20,7 +20,6 @@ export const createClassReport = async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  // Kiểm tra quyền giáo viên
   const classInfo = await prisma.class.findFirst({
     where: {
       id: classId,
@@ -33,7 +32,6 @@ export const createClassReport = async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  // Kiểm tra bảng điểm đã tồn tại chưa
   const existed = await prisma.report.findFirst({
     where: { classId, term },
   });
@@ -43,7 +41,6 @@ export const createClassReport = async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  // Lấy danh sách học sinh
   const students = await prisma.student.findMany({
     where: { classId },
     select: { id: true },
@@ -54,7 +51,6 @@ export const createClassReport = async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  // Tạo report cho từng học sinh
   await prisma.report.createMany({
     data: students.map((student: { id: string }) => ({
       studentId: student.id,
@@ -75,13 +71,11 @@ export const updateStudentReport = async (req: Request, res: Response): Promise<
   const { reportId } = req.params;
   const { grades, generalComment } = req.body;
 
-  // FIX LỖI 1: Kiểm tra reportId tồn tại
   if (!reportId) {
     res.status(400).json({ message: 'Thiếu Report ID' });
     return;
   }
 
-  // Tìm báo cáo (Không dùng include class để tránh lỗi property 'class')
   const report = await prisma.report.findUnique({
     where: { id: reportId },
   });
@@ -104,9 +98,8 @@ export const updateStudentReport = async (req: Request, res: Response): Promise<
     return;
   }
 
-  // Cập nhật
   const updated = await prisma.report.update({
-    where: { id: reportId }, // reportId ở đây chắc chắn là string do đã check ở trên
+    where: { id: reportId },
     data: {
       grades: grades ?? report.grades,
       generalComment: generalComment ?? report.generalComment,
@@ -123,7 +116,6 @@ export const updateStudentReport = async (req: Request, res: Response): Promise<
 export const getClassReport = async (req: Request, res: Response): Promise<void> => {
   const teacherId = req.user.id;
   
-  // Ép kiểu về string để tránh lỗi type undefined
   const classId = req.query.classId as string;
   const term = req.query.term as string;
 

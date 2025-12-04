@@ -1,8 +1,7 @@
-// src/server.ts
 import dotenv from 'dotenv';
-import app from './app'; // Import app đã cấu hình routes ở trên
-import { prisma } from './lib/prisma'; // Kết nối Prisma (cho Admin)
-import connectDB from './config/database'; // Kết nối Mongoose (cho Teacher cũ)
+import app from './app';
+import { prisma } from './lib/prisma';
+import connectDB from './config/database';
 
 dotenv.config();
 
@@ -10,25 +9,22 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    console.log("⏳ Đang khởi động hệ thống...");
+    console.log("Đang khởi động hệ thống...");
 
-    // 1. Kết nối MongoDB (Mongoose) - Dùng cho chức năng Teacher cũ
     await connectDB(); 
-    
-    // 2. Kết nối Prisma - Dùng cho Admin mới
-    await prisma.$connect();
-    console.log("✅ Connected to MongoDB via Prisma");
+    console.log("[Mongoose] Connected");
 
-    // 3. Chạy Server
+    await prisma.$connect();
+    console.log("[Prisma] Connected");
+
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`   - Admin API: http://localhost:${PORT}/api/admin/auth`);
-      console.log(`   - Teacher API: http://localhost:${PORT}/api/teacher/reports`);
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`- API Root: http://localhost:${PORT}/api`);
     });
 
   } catch (error) {
-    console.error("❌ Server startup failed:", error);
-    process.exit(1);
+    console.error("Server startup failed:", error);
+    process.exit(1); 
   }
 };
 
