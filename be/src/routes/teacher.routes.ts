@@ -1,18 +1,20 @@
 import { Router } from 'express';
-import {
-  createClassReport,
-  updateStudentReport,
-  getClassReport
-} from '../controllers/report.controller';
-import { teacherAuth } from '../middlewares/auth.teacher';
-import { loginTeacher } from '../controllers/teacher.auth.controller';
+import { loginTeacher, logoutTeacher} from '../controllers/teacher.auth.controller';
+import * as teacherFeature from '../controllers/teacher.feature.controller';
+import { verifyToken } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/create', teacherAuth, createClassReport);
-router.put('/:reportId', teacherAuth, updateStudentReport);
-router.get('/class', teacherAuth, getClassReport);
-
 router.post('/login', loginTeacher);
+router.post('/logout', verifyToken, logoutTeacher);
+
+
+router.get('/classes', verifyToken, teacherFeature.getMyClasses);
+
+router.get('/classes/:classId/students', verifyToken, teacherFeature.getClassStudents);
+
+router.get('/reports/:studentId', verifyToken, teacherFeature.getStudentReport);
+
+router.post('/reports', verifyToken, teacherFeature.saveReport);
 
 export default router;

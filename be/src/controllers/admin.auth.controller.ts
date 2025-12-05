@@ -33,3 +33,7 @@ export const createAdmin = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+export const logoutAdmin = async (req: Request, res: Response) => {
+  return res.status(200).json({ message: 'Admin đã đăng xuất thành công' });
+};

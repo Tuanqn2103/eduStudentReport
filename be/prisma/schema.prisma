@@ -74,6 +74,7 @@ model Report {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   isViewed       Boolean   @default(false)
+  isPublished    Boolean   @default(false)
 
   student Student @relation(fields: [studentId], references: [id])
   class   Class   @relation(fields: [classId], references: [id])
@@ -87,4 +88,14 @@ type Grade {
   subject String
   score   Float
   comment String?
+}
+
+model Subject {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  code      String? 
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("subjects")
 }

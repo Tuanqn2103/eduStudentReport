@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import * as studentRepo from '../repositories/student.repository';
 
-// Hàm helper tạo mã PIN
 const generatePin = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 export const resetStudentPinService = async (studentId: string) => {
@@ -14,7 +13,7 @@ export const resetStudentPinService = async (studentId: string) => {
   await studentRepo.updateStudentPin(studentId, hashedPin);
 
   return { 
-    newPin, // Trả về mã PIN chưa hash để hiển thị
+    newPin,
     studentName: student.fullName 
   };
 };
