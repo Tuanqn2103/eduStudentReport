@@ -1,10 +1,24 @@
 import { Router } from 'express';
 import { loginAdmin, createAdmin } from '../controllers/admin.auth.controller';
+import * as adminFeature from '../controllers/admin.feature.controller';
+
+import { verifyToken, requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// url: /api/admin/...
 router.post('/login', loginAdmin);
-router.post('/register', createAdmin);
+router.post('/register', createAdmin); 
+
+// Quản lý Giáo viên
+router.post('/teachers', adminFeature.createTeacherAccount);
+// Quản lý Lớp học
+router.get('/classes', adminFeature.getAllClassesList);
+router.post('/classes', adminFeature.createClass);
+// Phân công GV - Lớp
+router.post('/assign', adminFeature.assignTeacher);
+// Import Học sinh
+router.post('/students/import', adminFeature.importStudents);
+// Dashboard
+router.get('/stats', adminFeature.getDashboardStats);
 
 export default router;

@@ -26,7 +26,7 @@ model Admin {
   phoneNumber  String   @unique
   password     String
   fullName     String
-  isSuperAdmin Boolean  @default(false)
+  isAdmin      Boolean  @default(false)
   createdAt    DateTime @default(now())
 
   @@map("admins")

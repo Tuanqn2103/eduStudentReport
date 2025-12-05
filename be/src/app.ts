@@ -16,12 +16,10 @@ app.use((req, res, next) => {
 });
 
 // 2. Routes
-// Gom tất cả vào prefix /api
 app.use('/api/admin', adminRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/parent', parentRoutes);
 
-// Route mặc định kiểm tra server sống hay chết
 app.get('/', (req, res) => {
   res.json({ 
     status: 'success',
@@ -29,7 +27,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// 3. Error Handling Middleware (Nên có)
+// 3. Error Handling Middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ status: 'error', message: 'Something went wrong!' });

@@ -2,13 +2,6 @@ import type { Request, Response } from 'express'
 import { prisma } from '../lib/prisma.js';
 
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: { id: string; phoneNumber: string; role: string };
-    }
-  }
-}
 
 // 1. Tạo bảng điểm mới cho cả lớp
 export const createClassReport = async (req: Request, res: Response): Promise<void> => {
@@ -115,7 +108,6 @@ export const updateStudentReport = async (req: Request, res: Response): Promise<
 // 3. Xem bảng điểm cả lớp
 export const getClassReport = async (req: Request, res: Response): Promise<void> => {
   const teacherId = req.user.id;
-  
   const classId = req.query.classId as string;
   const term = req.query.term as string;
 

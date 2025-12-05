@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { loginParentService } from '../services/auth.service'; // Gọi Service
+import { loginParentService } from '../services/auth.service';
 
 export const parentLogin = async (req: Request, res: Response): Promise<void> => {
   try {

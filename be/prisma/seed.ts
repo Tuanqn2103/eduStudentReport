@@ -12,14 +12,14 @@ async function main() {
   });
 
   if (existingAdmin) {
-    console.log('⚠️ Admin đã tồn tại, không cần tạo mới.');
+    console.log('Admin đã tồn tại, không cần tạo mới.');
   } else {
     const newAdmin = await prisma.admin.create({
       data: {
         phoneNumber: phone,
         password: hashedPassword, 
         fullName: "Admin",
-        isSuperAdmin: true,
+        isAdmin: true,
       },
     });
     console.log('Đã tạo Admin mẫu thành công:', newAdmin);
