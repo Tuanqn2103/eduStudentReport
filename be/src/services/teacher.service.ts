@@ -68,6 +68,15 @@ export const getClassStudentsService = async (teacherId: string, classId: string
   });
 };
 
+export const getClassReportsService = async (teacherId: string, classId: string, term: string) => {
+  const classes = await teacherRepo.findClassesByTeacherId(teacherId);
+  const isManaged = classes.some(c => c.id === classId);
+  if (!isManaged) throw new Error('FORBIDDEN_CLASS');
+
+  const reports = await teacherRepo.findReportsByClassAndTerm(classId, term);
+  return reports;
+};
+
 export const getStudentGradeService = async (studentId: string, term: string) => {
   return await teacherRepo.findReportByStudentAndTerm(studentId, term);
 };

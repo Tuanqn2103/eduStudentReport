@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { loginParentService } from '../services/auth.service';
+import { loginParentService } from '../../services/auth.service';
 
 export const parentLogin = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -31,4 +31,7 @@ export const parentLogin = async (req: Request, res: Response): Promise<void> =>
 
     res.status(500).json({ message: 'Lỗi hệ thống' });
   }
+};
+export const logoutParent = async (req: Request, res: Response) => {
+  return res.status(200).json({ message: 'Parent đã đăng xuất thành công' });
 };

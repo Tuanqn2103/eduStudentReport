@@ -4,7 +4,7 @@ import * as teacherCtrl from '../controllers/admin/teacher.controller';
 import * as classCtrl from '../controllers/admin/class.controller';
 import * as studentCtrl from '../controllers/admin/student.controller';
 import * as dashboardCtrl from '../controllers/admin/dashboard.controller';
-import * as subjectController from '../controllers/subject.controller';
+import * as subjectController from '../controllers/admin/subject.controller';
 
 import { verifyToken, requireRole } from '../middlewares/auth.middleware';
 

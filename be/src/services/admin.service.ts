@@ -6,7 +6,9 @@ import * as adminRepo from '../repositories/admin.repository';
 import { 
   CreateAdminDto, 
   CreateTeacherDto, 
-  ImportStudentDto 
+  ImportStudentDto,UpdateTeacherDto,
+  UpdateClassDto,
+  UpdateStudentDto
 } from '../dtos/admin.dto';
 
 const generatePin = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -75,7 +77,7 @@ export const getTeacherByIdService = async (id: string) => {
   return teacher;
 };
 
-export const updateTeacherService = async (id: string, data: any) => {
+export const updateTeacherService = async (id: string, data: UpdateTeacherDto) => {
   const teacher = await adminRepo.findTeacherById(id);
   if (!teacher) throw new Error('NOT_FOUND');
   
@@ -131,7 +133,7 @@ export const getClassByIdService = async (id: string) => {
   return classInfo;
 };
 
-export const updateClassService = async (id: string, data: any) => {
+export const updateClassService = async (id: string, data: UpdateClassDto) => {
   const classInfo = await adminRepo.findClassById(id);
   if (!classInfo) throw new Error('NOT_FOUND');
   return await adminRepo.updateClass(id, data);
@@ -230,7 +232,7 @@ export const getStudentByIdService = async (id: string) => {
   return student;
 };
 
-export const updateStudentService = async (id: string, data: any) => {
+export const updateStudentService = async (id: string, data: UpdateStudentDto) => {
   const student = await adminRepo.findStudentById(id);
   if (!student) throw new Error('NOT_FOUND');
   return await adminRepo.updateStudent(id, data);

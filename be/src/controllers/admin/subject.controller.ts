@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import * as subjectService from '../services/subject.service';
-import { CreateSubjectDto } from '../dtos/subject.dto';
+import * as subjectService from '../../services/subject.service';
+import { CreateSubjectDto } from '../../dtos/subject.dto';
 
 // 1. Tạo môn học (Admin)
 export const createSubject = async (req: Request, res: Response) => {

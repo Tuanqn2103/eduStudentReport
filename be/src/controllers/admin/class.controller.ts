@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
 import * as adminService from '../../services/admin.service';
+import { CreateClassDto, UpdateClassDto, AssignTeacherDto } from '../../dtos/admin.dto';
 
 export const createClass = async (req: Request, res: Response) => {
   try {
-    const { className, schoolYear, teacherId } = req.body;
+    const body: CreateClassDto = req.body;
     
-    if (!className || !schoolYear) {
+    if (!body.className || !body.schoolYear) {
       return res.status(400).json({ message: 'Thiếu tên lớp hoặc năm học' });
     }
 
-    const newClass = await adminService.createClassService(className, schoolYear, teacherId);
+    const newClass = await adminService.createClassService(body.className, body.schoolYear, body.teacherId);
 
     return res.status(201).json({ 
-      message: teacherId ? 'Tạo lớp và phân công thành công' : 'Tạo lớp thành công', 
+      message: body.teacherId ? 'Tạo lớp và phân công thành công' : 'Tạo lớp thành công', 
       data: newClass 
     });
   } catch (error: any) {
@@ -54,8 +55,9 @@ export const getClassById = async (req: Request, res: Response) => {
 export const updateClass = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData = req.body; 
-    const updated = await adminService.updateClassService(id, updateData);
+    const body: UpdateClassDto = req.body; // Ép kiểu DTO
+    
+    const updated = await adminService.updateClassService(id, body);
     return res.status(200).json({ message: 'Cập nhật lớp thành công', data: updated });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp' });
@@ -76,10 +78,13 @@ export const deleteClass = async (req: Request, res: Response) => {
 
 export const assignTeacher = async (req: Request, res: Response) => {
   try {
-    const { teacherId, classId } = req.body;
-    if (!teacherId || !classId) return res.status(400).json({ message: 'Thiếu ID' });
+    const body: AssignTeacherDto = req.body;
+    
+    if (!body.teacherId || !body.classId) {
+      return res.status(400).json({ message: 'Thiếu ID' });
+    }
 
-    await adminService.assignTeacherToClassService(teacherId, classId);
+    await adminService.assignTeacherToClassService(body.teacherId, body.classId);
     return res.status(200).json({ message: 'Phân công thành công' });
   } catch (error) {
     return res.status(500).json({ message: 'Lỗi server' });

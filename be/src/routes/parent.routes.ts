@@ -1,11 +1,16 @@
-// src/routes/parent.routes.ts
 import { Router } from 'express';
-import { parentLogin } from '../controllers/parent.auth.controller';
+import { parentLogin } from '../controllers/parent/parent.auth.controller';
+import { logoutParent } from '../controllers/parent/parent.auth.controller';
+import * as parentFeature from '../controllers/parent/feature.controller';
+import { verifyToken } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// url: /api/parent/...
-
 router.post('/login', parentLogin);
+router.post('/logout', verifyToken, logoutParent);
+
+router.get('/children', verifyToken, parentFeature.getMyChildren);
+router.get('/children/:studentId/reports', verifyToken, parentFeature.getChildReports);
+router.get('/reports/:id', verifyToken, parentFeature.getReportDetail);
 
 export default router;

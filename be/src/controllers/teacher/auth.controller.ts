@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { loginTeacherService } from '../services/teacher.service';
-import { LoginTeacherDto } from '../dtos/teacher.dto';
+import { loginTeacherService } from '../../services/teacher.service';
+import { LoginTeacherDto } from '../../dtos/teacher.dto';
 
 export const loginTeacher = async (req: Request, res: Response) => {
   try {

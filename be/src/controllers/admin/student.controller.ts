@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
 import * as adminService from '../../services/admin.service';
+import { CreateStudentDto, ImportStudentDto, UpdateStudentDto } from '../../dtos/admin.dto';
 
-// [C] CREATE SINGLE (Tạo lẻ 1 học sinh)
+
 export const createStudent = async (req: Request, res: Response) => {
   try {
-    const { classId, fullName, parentPhones, dateOfBirth, gender } = req.body;
-    if (!classId || !fullName) return res.status(400).json({ message: 'Thiếu thông tin' });
+    const body: CreateStudentDto = req.body;
+    
+    if (!body.classId || !body.fullName) {
+      return res.status(400).json({ message: 'Thiếu thông tin' });
+    }
 
-    const newStudent = await adminService.createSingleStudentService(req.body);
+    const newStudent = await adminService.createSingleStudentService(body);
     return res.status(201).json({ message: 'Tạo học sinh thành công', data: newStudent });
   } catch (error: any) {
     if (error.message === 'CLASS_NOT_FOUND') return res.status(404).json({ message: 'Lớp không tồn tại' });
@@ -15,13 +19,16 @@ export const createStudent = async (req: Request, res: Response) => {
   }
 };
 
-// [C] IMPORT BATCH (Nhập nhiều từ Excel)
 export const importStudents = async (req: Request, res: Response) => {
   try {
     const { classId, students } = req.body;
-    if (!classId || !students || !Array.isArray(students)) return res.status(400).json({ message: 'Dữ liệu sai định dạng' });
+    const studentsDto: ImportStudentDto[] = students;
 
-    const result = await adminService.importStudentsService(classId, students);
+    if (!classId || !studentsDto || !Array.isArray(studentsDto)) {
+      return res.status(400).json({ message: 'Dữ liệu sai định dạng' });
+    }
+
+    const result = await adminService.importStudentsService(classId, studentsDto);
     return res.status(201).json({ message: 'Import thành công', exportData: result });
   } catch (error: any) {
     if (error.message === 'CLASS_NOT_FOUND') return res.status(404).json({ message: 'Lớp không tồn tại' });
@@ -29,7 +36,6 @@ export const importStudents = async (req: Request, res: Response) => {
   }
 };
 
-// [R] READ BY CLASS (Lấy DS học sinh theo lớp)
 export const getStudentsByClass = async (req: Request, res: Response) => {
   try {
     const { classId } = req.params;
@@ -40,7 +46,6 @@ export const getStudentsByClass = async (req: Request, res: Response) => {
   }
 };
 
-// [R] READ ONE
 export const getStudentById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -52,12 +57,12 @@ export const getStudentById = async (req: Request, res: Response) => {
   }
 };
 
-// [U] UPDATE
 export const updateStudent = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
-    const updated = await adminService.updateStudentService(id, updateData);
+    const body: UpdateStudentDto = req.body; // Ép kiểu DTO
+    
+    const updated = await adminService.updateStudentService(id, body);
     return res.status(200).json({ message: 'Cập nhật thành công', data: updated });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy học sinh' });
@@ -65,7 +70,7 @@ export const updateStudent = async (req: Request, res: Response) => {
   }
 };
 
-// [D] DELETE
+
 export const deleteStudent = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
