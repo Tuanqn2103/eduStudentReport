@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { parentLogin } from '../controllers/parent/parent.auth.controller';
-import { logoutParent } from '../controllers/parent/parent.auth.controller';
+import { parentLogin } from '../controllers/parent/auth.controller';
+import { logoutParent } from '../controllers/parent/auth.controller';
 import * as parentFeature from '../controllers/parent/feature.controller';
 import { verifyToken } from '../middlewares/auth.middleware';
 

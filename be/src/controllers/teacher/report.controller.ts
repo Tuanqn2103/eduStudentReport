@@ -7,6 +7,10 @@ export const getStudentReport = async (req: Request, res: Response) => {
     const { studentId } = req.params;
     const { term } = req.query;
     
+    if (!term) {
+      return res.status(400).json({ message: 'Thiếu kỳ học' });
+    }
+
     const report = await teacherService.getStudentGradeService(studentId, String(term));
     
     return res.status(200).json(report || null); 
@@ -17,7 +21,7 @@ export const getStudentReport = async (req: Request, res: Response) => {
 
 export const saveReport = async (req: Request, res: Response) => {
   try {
-    const teacherId = req.user.id;
+    const teacherId = req.user?.id;
     const body: UpsertReportDto = req.body;
 
     if (!body.studentId || !body.term || !body.grades) {
@@ -31,11 +35,11 @@ export const saveReport = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
 export const getClassReports = async (req: Request, res: Response) => {
   try {
-    const teacherId = req.user.id;
-    const { classId } = req.query;
-    const { term } = req.query;
+    const teacherId = req.user?.id;
+    const { classId, term } = req.query;
 
     if (!classId || !term) {
       return res.status(400).json({ message: 'Thiếu classId hoặc term' });
@@ -44,8 +48,9 @@ export const getClassReports = async (req: Request, res: Response) => {
     const reports = await teacherService.getClassReportsService(teacherId, String(classId), String(term));
     
     return res.status(200).json(reports);
-  } catch (error: any) {
-    if (error.message === 'FORBIDDEN_CLASS') return res.status(403).json({ message: 'Bạn không quản lý lớp này' });
+  } catch (error) {
+    const err = error as Error;
+    if (err.message === 'FORBIDDEN_CLASS') return res.status(403).json({ message: 'Bạn không quản lý lớp này' });
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };

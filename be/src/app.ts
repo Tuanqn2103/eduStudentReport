@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Logger đơn giản (để debug)
 app.use((req, res, next) => {
-  console.log(`👉 LOG REQUEST: [${req.method}] ${req.url}`);
+  console.log(`LOG REQUEST: [${req.method}] ${req.url}`);
   next();
 });
 
