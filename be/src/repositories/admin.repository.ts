@@ -24,6 +24,22 @@ export const updateTeacherClasses = async (teacherId: string, classId: string) =
   });
 };
 
+export const getAllTeachers = async () => {
+  return await prisma.teacher.findMany({ orderBy: { createdAt: 'desc' } });
+};
+
+export const findTeacherById = async (id: string) => {
+  return await prisma.teacher.findUnique({ where: { id } });
+};
+
+export const updateTeacher = async (id: string, data: Prisma.TeacherUpdateInput) => {
+  return await prisma.teacher.update({ where: { id }, data });
+};
+
+export const deleteTeacher = async (id: string) => {
+  return await prisma.teacher.delete({ where: { id } });
+};
+
 export const findClassByNameAndYear = async (className: string, schoolYear: string) => {
   return await prisma.class.findUnique({
     where: { className_schoolYear: { className, schoolYear } }
@@ -36,7 +52,29 @@ export const createClass = async (data: Prisma.ClassCreateInput) => {
 
 export const getAllClasses = async () => {
   return await prisma.class.findMany({
-    include: { _count: { select: { students: true } } }
+    include: { _count: { select: { students: true } } },
+  });
+};
+
+export const findClassesByName = async (className: string) => {
+  return await prisma.class.findMany({
+    where: { 
+      className: { contains: className, mode: 'insensitive' }
+    },
+    include: { _count: { select: { students: true } } },
+    orderBy: { schoolYear: 'desc' }
+  });
+};
+
+export const findClassById = async (id: string) => {
+  return await prisma.class.findUnique({
+    where: { id },
+    include: {
+      _count: { select: { students: true } },
+      students: {
+        orderBy: { fullName: 'asc' }
+      }
+    }
   });
 };
 
@@ -47,10 +85,45 @@ export const updateClassTeachers = async (classId: string, teacherId: string) =>
   });
 };
 
+export const updateClass = async (id: string, data: Prisma.ClassUpdateInput) => {
+  return await prisma.class.update({ where: { id }, data });
+};
+
+export const deleteClass = async (id: string) => {
+  return await prisma.class.delete({ where: { id } });
+};
+
 export const createManyStudents = async (studentsData: Prisma.StudentCreateInput[]) => {
   return await prisma.$transaction(
     studentsData.map((student) => prisma.student.create({ data: student }))
   );
+};
+
+export const createStudent = async (data: Prisma.StudentCreateInput) => {
+  return await prisma.student.create({ data });
+};
+
+export const getStudentsByClassId = async (classId: string) => {
+  return await prisma.student.findMany({
+    where: { classId: classId },
+    orderBy: { fullName: 'asc' }
+  });
+};
+
+export const findStudentById = async (id: string) => {
+  return await prisma.student.findUnique({ where: { id } });
+};
+
+export const updateStudent = async (id: string, data: Prisma.StudentUpdateInput) => {
+  return await prisma.student.update({ where: { id }, data });
+};
+
+export const deleteStudent = async (id: string) => {
+  return await prisma.student.delete({ where: { id } });
+};
+
+export const countStudentsInClass = async (classId: string) => {
+  return await prisma.student.count({ where: { classId } });
 };
 
 export const getSystemStats = async () => {
@@ -60,14 +133,4 @@ export const getSystemStats = async () => {
     prisma.class.count(),
   ]);
   return { teacherCount, studentCount, classCount };
-};
-
-export const findClassById = async (id: string) => {
-  return await prisma.class.findUnique({ where: { id } });
-};
-
-export const countStudentsInClass = async (classId: string) => {
-  return await prisma.student.count({
-    where: { classId }
-  });
 };

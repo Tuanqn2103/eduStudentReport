@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { loginAdminService, createAdminService } from '../services/admin.service';
+import { loginAdminService, createAdminService } from '../../services/admin.service';
 
 export const loginAdmin = async (req: Request, res: Response) => {
   try {

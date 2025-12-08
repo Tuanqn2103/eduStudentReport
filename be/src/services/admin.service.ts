@@ -11,6 +11,8 @@ import {
 
 const generatePin = () => Math.floor(100000 + Math.random() * 900000).toString();
 
+// --- AUTH ---
+
 export const loginAdminService = async (phoneNumber: string, pass: string) => {
   const admin = await adminRepo.findAdminByPhone(phoneNumber);
   if (!admin) throw new Error('ADMIN_NOT_FOUND');
@@ -42,6 +44,8 @@ export const createAdminService = async (data: CreateAdminDto) => {
   return await adminRepo.createAdmin(adminData);
 };
 
+// --- TEACHER ---
+
 export const createTeacherService = async (data: CreateTeacherDto) => {
   const exists = await adminRepo.findTeacherByPhone(data.phoneNumber);
   if (exists) throw new Error('PHONE_EXISTED');
@@ -58,6 +62,36 @@ export const createTeacherService = async (data: CreateTeacherDto) => {
 
   return await adminRepo.createTeacher(teacherData);
 };
+
+export const getAllTeachersService = async () => {
+  return await adminRepo.getAllTeachers();
+};
+export const getTeacherByPhoneService = async (phoneNumber: string) => {
+  return await adminRepo.findTeacherByPhone(phoneNumber);
+};
+export const getTeacherByIdService = async (id: string) => {
+  const teacher = await adminRepo.findTeacherById(id);
+  if (!teacher) throw new Error('NOT_FOUND');
+  return teacher;
+};
+
+export const updateTeacherService = async (id: string, data: any) => {
+  const teacher = await adminRepo.findTeacherById(id);
+  if (!teacher) throw new Error('NOT_FOUND');
+  
+  if (data.password) {
+    data.password = await bcrypt.hash(data.password, 10);
+  }
+  return await adminRepo.updateTeacher(id, data);
+};
+
+export const deleteTeacherService = async (id: string) => {
+  const teacher = await adminRepo.findTeacherById(id);
+  if (!teacher) throw new Error('NOT_FOUND');
+  return await adminRepo.deleteTeacher(id);
+};
+
+// --- CLASS ---
 
 export const createClassService = async (className: string, schoolYear: string, teacherId?: string) => {
   const exists = await adminRepo.findClassByNameAndYear(className, schoolYear);
@@ -83,18 +117,45 @@ export const createClassService = async (className: string, schoolYear: string, 
   return newClass;
 };
 
+export const getAllClassesService = async () => {
+  return await adminRepo.getAllClasses();
+};
+
+export const findClassesByNameService = async (className: string) => {
+  return await adminRepo.findClassesByName(className);
+};
+
+export const getClassByIdService = async (id: string) => {
+  const classInfo = await adminRepo.findClassById(id);
+  if (!classInfo) throw new Error('NOT_FOUND');
+  return classInfo;
+};
+
+export const updateClassService = async (id: string, data: any) => {
+  const classInfo = await adminRepo.findClassById(id);
+  if (!classInfo) throw new Error('NOT_FOUND');
+  return await adminRepo.updateClass(id, data);
+};
+
+export const deleteClassService = async (id: string) => {
+  const classInfo = await adminRepo.findClassById(id);
+  if (!classInfo) throw new Error('NOT_FOUND');
+  return await adminRepo.deleteClass(id);
+};
+
 export const assignTeacherToClassService = async (teacherId: string, classId: string) => {
   await adminRepo.updateTeacherClasses(teacherId, classId);
   await adminRepo.updateClassTeachers(classId, teacherId);
   return { success: true };
 };
 
+// --- STUDENT ---
+
 export const importStudentsService = async (classId: string, studentsRawData: ImportStudentDto[]) => {
   const classInfo = await adminRepo.findClassById(classId);
   if (!classInfo) throw new Error('CLASS_NOT_FOUND');
 
   const currentCount = await adminRepo.countStudentsInClass(classId);
-  
   let serialNumber = currentCount + 1;
 
   const processedData: Prisma.StudentCreateInput[] = [];
@@ -119,13 +180,10 @@ export const importStudentsService = async (classId: string, studentsRawData: Im
       parentPin: hashedPin,
       gender: student.gender || null,
       dateOfBirth: student.dateOfBirth ? new Date(student.dateOfBirth) : null,
-      class: {
-        connect: { id: classId }
-      }
+      class: { connect: { id: classId } }
     };
 
     processedData.push(studentInput);
-
     exportData.push({
       fullName: student.fullName,
       studentCode: finalStudentCode,
@@ -134,8 +192,54 @@ export const importStudentsService = async (classId: string, studentsRawData: Im
   }
 
   await adminRepo.createManyStudents(processedData);
-
   return exportData;
+};
+
+export const createSingleStudentService = async (data: ImportStudentDto & { classId: string }) => {
+  const classInfo = await adminRepo.findClassById(data.classId);
+  if (!classInfo) throw new Error('CLASS_NOT_FOUND');
+
+  const rawPin = generatePin();
+  const hashedPin = await bcrypt.hash(rawPin, 10);
+  
+  const currentCount = await adminRepo.countStudentsInClass(data.classId);
+  const suffix = String(currentCount + 1).padStart(3, '0');
+  const studentCode = `HS${classInfo.className}${suffix}`;
+
+  const studentData: Prisma.StudentCreateInput = {
+    fullName: data.fullName,
+    studentCode,
+    parentPhones: data.parentPhones || [],
+    parentPin: hashedPin,
+    gender: data.gender,
+    dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+    class: { connect: { id: data.classId } }
+  };
+
+  const newStudent = await adminRepo.createStudent(studentData);
+  return { ...newStudent, pin: rawPin };
+};
+
+export const getStudentsByClassService = async (classId: string) => {
+  return await adminRepo.getStudentsByClassId(classId);
+};
+
+export const getStudentByIdService = async (id: string) => {
+  const student = await adminRepo.findStudentById(id);
+  if (!student) throw new Error('NOT_FOUND');
+  return student;
+};
+
+export const updateStudentService = async (id: string, data: any) => {
+  const student = await adminRepo.findStudentById(id);
+  if (!student) throw new Error('NOT_FOUND');
+  return await adminRepo.updateStudent(id, data);
+};
+
+export const deleteStudentService = async (id: string) => {
+  const student = await adminRepo.findStudentById(id);
+  if (!student) throw new Error('NOT_FOUND');
+  return await adminRepo.deleteStudent(id);
 };
 
 export const getDashboardStatsService = async () => {

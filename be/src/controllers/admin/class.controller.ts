@@ -1,0 +1,87 @@
+import { Request, Response } from 'express';
+import * as adminService from '../../services/admin.service';
+
+export const createClass = async (req: Request, res: Response) => {
+  try {
+    const { className, schoolYear, teacherId } = req.body;
+    
+    if (!className || !schoolYear) {
+      return res.status(400).json({ message: 'Thiếu tên lớp hoặc năm học' });
+    }
+
+    const newClass = await adminService.createClassService(className, schoolYear, teacherId);
+
+    return res.status(201).json({ 
+      message: teacherId ? 'Tạo lớp và phân công thành công' : 'Tạo lớp thành công', 
+      data: newClass 
+    });
+  } catch (error: any) {
+    if (error.message === 'CLASS_EXISTED') return res.status(400).json({ message: 'Lớp đã tồn tại' });
+    if (error.message === 'TEACHER_NOT_FOUND') return res.status(404).json({ message: 'Giáo viên không tồn tại' });
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const getClasses = async (req: Request, res: Response) => {
+  try {
+    const { className } = req.query;
+
+    // Nếu có param className thì tìm kiếm
+    if (className) {
+      const classes = await adminService.findClassesByNameService(String(className));
+      return res.status(200).json(classes);
+    }
+
+    // Không có thì lấy tất cả
+    const classes = await adminService.getAllClassesService();
+    return res.status(200).json(classes);
+  } catch (error) {
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const getClassById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const classInfo = await adminService.getClassByIdService(id);
+    return res.status(200).json(classInfo);
+  } catch (error: any) {
+    if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp học' });
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const updateClass = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body; 
+    const updated = await adminService.updateClassService(id, updateData);
+    return res.status(200).json({ message: 'Cập nhật lớp thành công', data: updated });
+  } catch (error: any) {
+    if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp' });
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const deleteClass = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await adminService.deleteClassService(id);
+    return res.status(200).json({ message: 'Xóa lớp thành công' });
+  } catch (error: any) {
+    if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp' });
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+export const assignTeacher = async (req: Request, res: Response) => {
+  try {
+    const { teacherId, classId } = req.body;
+    if (!teacherId || !classId) return res.status(400).json({ message: 'Thiếu ID' });
+
+    await adminService.assignTeacherToClassService(teacherId, classId);
+    return res.status(200).json({ message: 'Phân công thành công' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};
