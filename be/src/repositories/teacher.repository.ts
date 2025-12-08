@@ -44,6 +44,7 @@ export const findReportByStudentAndTerm = async (studentId: string, term: string
     where: { studentId, term }
   });
 };
+
 export const findReportsByClassAndTerm = async (classId: string, term: string) => {
   return await prisma.report.findMany({
     where: { classId, term },
@@ -55,6 +56,7 @@ export const findReportsByClassAndTerm = async (classId: string, term: string) =
     orderBy: { student: { fullName: 'asc' } }
   });
 };
+
 export const upsertReport = async (data: Prisma.ReportCreateInput, reportId?: string) => {
   if (reportId) {
     return await prisma.report.update({
