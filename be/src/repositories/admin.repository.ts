@@ -29,7 +29,16 @@ export const getAllTeachers = async () => {
 };
 
 export const findTeacherById = async (id: string) => {
-  return await prisma.teacher.findUnique({ where: { id } });
+  const teacher = await prisma.teacher.findUnique({ where: { id } });
+  
+  if (!teacher) return null;
+  const classes = await prisma.class.findMany({
+    where: {
+      id: { in: teacher.managedClassIds }
+    },
+    select: { id: true, className: true, schoolYear: true }
+  });
+  return { ...teacher, managedClasses: classes };
 };
 
 export const updateTeacher = async (id: string, data: Prisma.TeacherUpdateInput) => {
