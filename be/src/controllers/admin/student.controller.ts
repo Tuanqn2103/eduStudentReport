@@ -81,3 +81,9 @@ export const deleteStudent = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+export const resetPin = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await adminService.resetStudentPinService(id);
+  return res.status(200).json({ message: "Reset thành công", data: result });
+};

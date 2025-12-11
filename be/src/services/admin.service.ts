@@ -244,6 +244,21 @@ export const deleteStudentService = async (id: string) => {
   return await adminRepo.deleteStudent(id);
 };
 
+export const resetStudentPinService = async (studentId: string) => {
+  const student = await adminRepo.findStudentById(studentId);
+  if (!student) throw new Error('NOT_FOUND');
+
+  const newPin = generatePin();
+  const hashedPin = await bcrypt.hash(newPin, 10);
+
+  await adminRepo.updateStudent(studentId, { parentPin: hashedPin });
+
+  return { 
+    newPin,
+    studentName: student.fullName 
+  };
+};
+
 export const getDashboardStatsService = async () => {
   return await adminRepo.getSystemStats();
 };

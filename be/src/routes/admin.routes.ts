@@ -37,6 +37,8 @@ router.get('/classes/:classId/students', verifyToken, requireRole(['superadmin']
 router.get('/students/:id', verifyToken, requireRole(['superadmin']), studentCtrl.getStudentById);
 router.put('/students/:id', verifyToken, requireRole(['superadmin']), studentCtrl.updateStudent);
 router.delete('/students/:id', verifyToken, requireRole(['superadmin']), studentCtrl.deleteStudent);
+router.post('/students/:id/reset-pin', verifyToken, requireRole(['superadmin']), studentCtrl.resetPin);
+
 
 // --- Subject Routes ---
 router.post('/subjects', verifyToken, requireRole(['superadmin']), subjectController.createSubject);

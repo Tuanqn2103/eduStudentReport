@@ -115,7 +115,7 @@ export const createStudent = async (data: Prisma.StudentCreateInput) => {
 export const getStudentsByClassId = async (classId: string) => {
   return await prisma.student.findMany({
     where: { classId: classId },
-    orderBy: { fullName: 'asc' }
+    orderBy: { studentCode: 'asc' }
   });
 };
 
