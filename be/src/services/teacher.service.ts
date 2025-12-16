@@ -96,3 +96,15 @@ export const inputGradeService = async (teacherId: string, data: UpsertReportDto
 
   return await teacherRepo.upsertReport(reportData, existingReport?.id);
 };
+
+export const getDashboardStatsService = async (teacherId: string) => {
+  const [classCount, studentCount] = await Promise.all([
+    teacherRepo.countClassesByTeacher(teacherId),
+    teacherRepo.countStudentsByTeacher(teacherId)
+  ]);
+
+  return {
+    classCount,
+    studentCount
+  };
+};

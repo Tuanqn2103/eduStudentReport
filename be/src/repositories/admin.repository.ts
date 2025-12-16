@@ -18,9 +18,13 @@ export const createTeacher = async (data: Prisma.TeacherCreateInput) => {
 };
 
 export const updateTeacherClasses = async (teacherId: string, classId: string) => {
+  const teacher = await prisma.teacher.findUnique({ where: { id: teacherId } });
+  if (!teacher) return;
+  const current = Array.isArray(teacher.managedClassIds) ? teacher.managedClassIds : [];
+  const newClassIds = Array.from(new Set([...current, classId]));
   return await prisma.teacher.update({
     where: { id: teacherId },
-    data: { managedClassIds: { push: classId } }
+    data: { managedClassIds: { set: newClassIds } }
   });
 };
 
@@ -30,7 +34,7 @@ export const getAllTeachers = async () => {
 
 export const findTeacherById = async (id: string) => {
   const teacher = await prisma.teacher.findUnique({ where: { id } });
-  
+
   if (!teacher) return null;
   const classes = await prisma.class.findMany({
     where: {
@@ -67,7 +71,7 @@ export const getAllClasses = async () => {
 
 export const findClassesByName = async (className: string) => {
   return await prisma.class.findMany({
-    where: { 
+    where: {
       className: { contains: className, mode: 'insensitive' }
     },
     include: { _count: { select: { students: true } } },
@@ -87,10 +91,24 @@ export const findClassById = async (id: string) => {
   });
 };
 
-export const updateClassTeachers = async (classId: string, teacherId: string) => {
+export const updateClassTeachers = async (classId: string, teacherId?: string) => {
   return await prisma.class.update({
     where: { id: classId },
-    data: { teacherIds: { push: teacherId } }
+    data: {
+      teacherIds: teacherId ? { set: [teacherId] } : { set: [] }
+    }
+  });
+};
+
+export const removeClassFromTeacher = async (teacherId: string, classId: string) => {
+  const teacher = await prisma.teacher.findUnique({ where: { id: teacherId } });
+  if (!teacher) return;
+
+  const newClassIds = (teacher.managedClassIds || []).filter((id) => id !== classId);
+
+  return await prisma.teacher.update({
+    where: { id: teacherId },
+    data: { managedClassIds: { set: newClassIds } }
   });
 };
 

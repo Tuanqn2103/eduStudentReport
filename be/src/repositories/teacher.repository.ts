@@ -72,3 +72,33 @@ export const upsertReport = async (data: Prisma.ReportCreateInput, reportId?: st
     return await prisma.report.create({ data });
   }
 };
+
+
+export const countClassesByTeacher = async (teacherId: string) => {
+  return await prisma.class.count({
+    where: {
+      teacherIds: { has: teacherId },
+      isActive: true
+    }
+  });
+};
+
+export const countStudentsByTeacher = async (teacherId: string) => {
+  const classes = await prisma.class.findMany({
+    where: {
+      teacherIds: { has: teacherId },
+      isActive: true
+    },
+    select: { id: true }
+  });
+
+  const classIds = classes.map(c => c.id);
+
+  if (classIds.length === 0) return 0;
+
+  return await prisma.student.count({
+    where: {
+      classId: { in: classIds }
+    }
+  });
+};

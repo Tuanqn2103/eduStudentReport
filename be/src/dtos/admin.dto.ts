@@ -17,7 +17,6 @@ export interface UpdateTeacherDto {
   phoneNumber?: string;
   password?:    string;
   isActive?:    boolean;
-  // managedClassIds thường được update qua hàm assign, nhưng có thể cho phép sửa ở đây nếu muốn
 }
 
 // --- CLASS ---
@@ -31,6 +30,7 @@ export interface UpdateClassDto {
   className?:  string;
   schoolYear?: string;
   isActive?:   boolean;
+  teacherId?:  string;
 }
 
 export interface AssignTeacherDto {

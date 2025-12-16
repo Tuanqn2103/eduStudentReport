@@ -3,10 +3,10 @@ import jwt from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import * as adminRepo from '../repositories/admin.repository';
-import { 
-  CreateAdminDto, 
-  CreateTeacherDto, 
-  ImportStudentDto,UpdateTeacherDto,
+import {
+  CreateAdminDto,
+  CreateTeacherDto,
+  ImportStudentDto, UpdateTeacherDto,
   UpdateClassDto,
   UpdateStudentDto
 } from '../dtos/admin.dto';
@@ -18,7 +18,7 @@ const generatePin = () => Math.floor(100000 + Math.random() * 900000).toString()
 export const loginAdminService = async (phoneNumber: string, pass: string) => {
   const admin = await adminRepo.findAdminByPhone(phoneNumber);
   if (!admin) throw new Error('ADMIN_NOT_FOUND');
-  
+
   const isMatch = await bcrypt.compare(pass, admin.password);
   if (!isMatch) throw new Error('WRONG_PASSWORD');
 
@@ -35,7 +35,7 @@ export const createAdminService = async (data: CreateAdminDto) => {
   if (exists) throw new Error('PHONE_EXISTED');
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  
+
   const adminData: Prisma.AdminCreateInput = {
     phoneNumber: data.phoneNumber,
     password: hashedPassword,
@@ -53,7 +53,7 @@ export const createTeacherService = async (data: CreateTeacherDto) => {
   if (exists) throw new Error('PHONE_EXISTED');
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  
+
   const teacherData: Prisma.TeacherCreateInput = {
     fullName: data.fullName,
     phoneNumber: data.phoneNumber,
@@ -80,7 +80,7 @@ export const getTeacherByIdService = async (id: string) => {
 export const updateTeacherService = async (id: string, data: UpdateTeacherDto) => {
   const teacher = await adminRepo.findTeacherById(id);
   if (!teacher) throw new Error('NOT_FOUND');
-  
+
   if (data.password) {
     data.password = await bcrypt.hash(data.password, 10);
   }
@@ -136,8 +136,29 @@ export const getClassByIdService = async (id: string) => {
 export const updateClassService = async (id: string, data: UpdateClassDto) => {
   const classInfo = await adminRepo.findClassById(id);
   if (!classInfo) throw new Error('NOT_FOUND');
-  return await adminRepo.updateClass(id, data);
+
+  const oldTeacherId = classInfo.teacherIds[0] ?? null;
+  const newTeacherId = data.teacherId ?? null;
+
+  await adminRepo.updateClass(id, {
+    className: data.className,
+    schoolYear: data.schoolYear,
+    isActive: data.isActive
+  });
+
+  if (!newTeacherId && oldTeacherId) {
+    await adminRepo.removeClassFromTeacher(oldTeacherId, id);
+    await adminRepo.updateClassTeachers(id, '');
+    return { success: true };
+  }
+
+  if (newTeacherId && newTeacherId !== oldTeacherId) {
+    await assignTeacherToClassService(newTeacherId, id);
+  }
+
+  return { success: true };
 };
+
 
 export const deleteClassService = async (id: string) => {
   const classInfo = await adminRepo.findClassById(id);
@@ -146,6 +167,12 @@ export const deleteClassService = async (id: string) => {
 };
 
 export const assignTeacherToClassService = async (teacherId: string, classId: string) => {
+  const currentClass = await adminRepo.findClassById(classId);
+  if (!currentClass) throw new Error('CLASS_NOT_FOUND');
+  const oldTeacherId = currentClass.teacherIds[0];
+  if (oldTeacherId && oldTeacherId !== teacherId) {
+    await adminRepo.removeClassFromTeacher(oldTeacherId, classId);
+  }
   await adminRepo.updateTeacherClasses(teacherId, classId);
   await adminRepo.updateClassTeachers(classId, teacherId);
   return { success: true };
@@ -164,13 +191,13 @@ export const importStudentsService = async (classId: string, studentsRawData: Im
   const exportData = [];
 
   for (const student of studentsRawData) {
-    const rawPin = generatePin(); 
+    const rawPin = generatePin();
     const hashedPin = await bcrypt.hash(rawPin, 10);
 
     let finalStudentCode = student.studentCode;
 
     if (!finalStudentCode) {
-      const suffix = String(serialNumber).padStart(3, '0'); 
+      const suffix = String(serialNumber).padStart(3, '0');
       finalStudentCode = `HS${classInfo.className}${suffix}`;
       serialNumber++;
     }
@@ -189,7 +216,7 @@ export const importStudentsService = async (classId: string, studentsRawData: Im
     exportData.push({
       fullName: student.fullName,
       studentCode: finalStudentCode,
-      pin: rawPin 
+      pin: rawPin
     });
   }
 
@@ -203,7 +230,7 @@ export const createSingleStudentService = async (data: ImportStudentDto & { clas
 
   const rawPin = generatePin();
   const hashedPin = await bcrypt.hash(rawPin, 10);
-  
+
   const currentCount = await adminRepo.countStudentsInClass(data.classId);
   const suffix = String(currentCount + 1).padStart(3, '0');
   const studentCode = `HS${classInfo.className}${suffix}`;
@@ -253,9 +280,9 @@ export const resetStudentPinService = async (studentId: string) => {
 
   await adminRepo.updateStudent(studentId, { parentPin: hashedPin });
 
-  return { 
+  return {
     newPin,
-    studentName: student.fullName 
+    studentName: student.fullName
   };
 };
 
