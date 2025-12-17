@@ -78,7 +78,25 @@ export const getClassReportsService = async (teacherId: string, classId: string,
 };
 
 export const getStudentGradeService = async (studentId: string, term: string) => {
-  return await teacherRepo.findReportByStudentAndTerm(studentId, term);
+  const report = await teacherRepo.findReportByStudentAndTerm(studentId, term);
+  if (report) {
+    return report;
+  }
+  const student = await teacherRepo.findStudentById(studentId);
+  if (!student) {
+    return null;
+  }
+  return {
+    studentId: student.id,
+    term: term,
+    grades: [],
+    generalComment: "",
+    isPublished: false,
+    student: {
+      fullName: student.fullName,
+      studentCode: student.studentCode
+    }
+  };
 };
 
 export const inputGradeService = async (teacherId: string, data: UpsertReportDto) => {
@@ -107,4 +125,14 @@ export const getDashboardStatsService = async (teacherId: string) => {
     classCount,
     studentCount
   };
+};
+export const deleteReportService = async (teacherId: string, reportId: string) => {
+  const report = await prisma.report.findUnique({ where: { id: reportId } });
+  if (!report) throw new Error('NOT_FOUND');
+  
+  if (report.createdBy !== teacherId) {
+    throw new Error('FORBIDDEN');
+  }
+
+  return await teacherRepo.deleteReport(reportId);
 };

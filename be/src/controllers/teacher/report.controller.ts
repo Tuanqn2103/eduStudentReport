@@ -54,3 +54,15 @@ export const getClassReports = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
+export const deleteReport = async (req: Request, res: Response) => {
+  try {
+    const teacherId = req.user?.id;
+    const { reportId } = req.params;
+    await teacherService.deleteReportService(teacherId, reportId);
+    return res.status(200).json({ message: 'Xóa báo cáo thành công' });
+  } catch (error: any) {
+    if (error.message === 'FORBIDDEN') return res.status(403).json({ message: 'Không có quyền xóa' });
+    return res.status(500).json({ message: 'Lỗi server' });
+  }
+};

@@ -24,6 +24,8 @@ router.get('/classes/:classId/students', verifyToken, studentCtrl.getClassStuden
 // --- REPORT (ĐIỂM) ---
 router.get('/reports/:studentId', verifyToken, reportCtrl.getStudentReport);
 router.get('/reports', verifyToken, reportCtrl.getClassReports);
+router.delete('/reports/:reportId', verifyToken, reportCtrl.deleteReport);
+
 // Nhập điểm / Lưu điểm
 router.post('/reports', verifyToken, reportCtrl.saveReport);
 

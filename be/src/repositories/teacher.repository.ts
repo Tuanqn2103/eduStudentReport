@@ -41,7 +41,19 @@ export const findStudentsInClassWithReport = async (classId: string, term: strin
 
 export const findReportByStudentAndTerm = async (studentId: string, term: string) => {
   return await prisma.report.findFirst({
-    where: { studentId, term }
+    where: { studentId, term },
+    include: {
+      student: {
+        select: { fullName: true, studentCode: true }
+      }
+    }
+  });
+};
+
+export const findStudentById = async (id: string) => {
+  return await prisma.student.findUnique({
+    where: { id },
+    select: { id: true, fullName: true, studentCode: true }
   });
 };
 
@@ -101,4 +113,8 @@ export const countStudentsByTeacher = async (teacherId: string) => {
       classId: { in: classIds }
     }
   });
+};
+
+export const deleteReport = async (reportId: string) => {
+  return await prisma.report.delete({ where: { id: reportId } });
 };
