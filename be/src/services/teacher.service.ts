@@ -136,3 +136,20 @@ export const deleteReportService = async (teacherId: string, reportId: string) =
 
   return await teacherRepo.deleteReport(reportId);
 };
+
+export const getStudentDetailService = async (teacherId: string, studentId: string) => {
+  const hasAccess = await teacherRepo.isStudentInTeacherClass(studentId, teacherId);
+  if (!hasAccess) throw new Error('FORBIDDEN_STUDENT');
+  return await teacherRepo.findStudentById(studentId);
+};
+
+export const updateStudentService = async (teacherId: string, studentId: string, data: any) => {
+  const hasAccess = await teacherRepo.isStudentInTeacherClass(studentId, teacherId);
+  if (!hasAccess) throw new Error('FORBIDDEN_STUDENT');
+  const updateData: Prisma.StudentUpdateInput = {
+    parentPhones: data.parentPhones,
+    dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
+    gender: data.gender
+  };
+  return await teacherRepo.updateStudent(studentId, updateData);
+};

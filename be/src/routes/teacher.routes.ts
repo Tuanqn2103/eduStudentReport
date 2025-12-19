@@ -20,6 +20,10 @@ router.get('/classes', verifyToken, classCtrl.getMyClasses);
 
 // --- STUDENT ---
 router.get('/classes/:classId/students', verifyToken, studentCtrl.getClassStudents);
+router.get('/students/:id', verifyToken, studentCtrl.getStudentDetail);
+router.put('/students/:id', verifyToken, studentCtrl.updateStudent);
+
+
 
 // --- REPORT (ĐIỂM) ---
 router.get('/reports/:studentId', verifyToken, reportCtrl.getStudentReport);

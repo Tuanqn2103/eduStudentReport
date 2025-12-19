@@ -53,7 +53,11 @@ export const findReportByStudentAndTerm = async (studentId: string, term: string
 export const findStudentById = async (id: string) => {
   return await prisma.student.findUnique({
     where: { id },
-    select: { id: true, fullName: true, studentCode: true }
+    include: {
+      class: {
+        select: { className: true, schoolYear: true }
+      }
+    }
   });
 };
 
@@ -117,4 +121,22 @@ export const countStudentsByTeacher = async (teacherId: string) => {
 
 export const deleteReport = async (reportId: string) => {
   return await prisma.report.delete({ where: { id: reportId } });
+};
+
+export const updateStudent = async (id: string, data: Prisma.StudentUpdateInput) => {
+  return await prisma.student.update({
+    where: { id },
+    data
+  });
+};
+
+export const isStudentInTeacherClass = async (studentId: string, teacherId: string) => {
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    include: { class: true }
+  });
+
+  if (!student || !student.class) return false;
+  
+  return student.class.teacherIds.includes(teacherId);
 };

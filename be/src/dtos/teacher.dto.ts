@@ -17,3 +17,9 @@ export interface UpsertReportDto {
   generalComment?: string;
   isPublished?:    boolean;
 }
+
+export interface UpdateStudentDto {
+  parentPhones?: string[];
+  dateOfBirth?: string | Date;
+  gender?: string;
+}
