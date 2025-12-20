@@ -1,37 +1,33 @@
 import { Request, Response } from 'express';
 import { loginParentService } from '../../services/auth.service';
 
-export const parentLogin = async (req: Request, res: Response): Promise<void> => {
+export const parentLogin = async (req: Request, res: Response) => {
   try {
     const { phoneNumber, pin } = req.body;
 
     if (!phoneNumber || !pin) {
-      res.status(400).json({ message: 'Vui lòng nhập SĐT và mã PIN' });
-      return;
+      return res.status(400).json({ message: 'Vui lòng nhập SĐT và mã PIN' });
     }
 
     const result = await loginParentService(phoneNumber, pin);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Đăng nhập thành công',
-      data: result
+      ...result 
     });
 
   } catch (error: any) {
-    console.error('Login Error:', error);
-
     if (error.message === 'PHONE_NOT_FOUND') {
-      res.status(404).json({ message: 'Số điện thoại không tồn tại' });
-      return;
+      return res.status(404).json({ message: 'Số điện thoại không tồn tại' });
     }
     if (error.message === 'WRONG_PIN') {
-      res.status(400).json({ message: 'Mã PIN không chính xác' });
-      return;
+      return res.status(400).json({ message: 'Mã PIN không chính xác' });
     }
 
-    res.status(500).json({ message: 'Lỗi hệ thống' });
+    return res.status(500).json({ message: 'Lỗi hệ thống' });
   }
 };
+
 export const logoutParent = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: 'Parent đã đăng xuất thành công' });
+  return res.status(200).json({ message: 'Phụ huynh đã đăng xuất thành công' });
 };
