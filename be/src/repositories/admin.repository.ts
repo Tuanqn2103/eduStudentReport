@@ -161,3 +161,36 @@ export const getSystemStats = async () => {
   ]);
   return { teacherCount, studentCount, classCount };
 };
+
+export const findRecentTeachers = async (limit: number = 5) => {
+  return await prisma.teacher.findMany({
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      fullName: true,
+      phoneNumber: true,
+      managedClassIds: true,
+      createdAt: true
+    }
+  });
+};
+
+export const countEntitiesByDateRange = async (
+  model: 'student' | 'teacher', 
+  startDate: Date, 
+  endDate: Date
+) => {
+  const whereClause = {
+    createdAt: {
+      gte: startDate,
+      lt: endDate
+    }
+  };
+
+  if (model === 'teacher') {
+    return await prisma.teacher.count({ where: whereClause });
+  }
+
+  return await prisma.student.count({ where: whereClause });
+};

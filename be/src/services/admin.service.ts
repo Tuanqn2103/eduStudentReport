@@ -287,5 +287,33 @@ export const resetStudentPinService = async (studentId: string) => {
 };
 
 export const getDashboardStatsService = async () => {
-  return await adminRepo.getSystemStats();
+  const { teacherCount, studentCount, classCount } = await adminRepo.getSystemStats();
+  const recentTeachers = await adminRepo.findRecentTeachers(5);
+  const now = new Date();
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const teachersThisMonth = await adminRepo.countEntitiesByDateRange('teacher', startOfThisMonth, now);
+  const studentsThisMonth = await adminRepo.countEntitiesByDateRange('student', startOfThisMonth, now);
+
+  const teachersLastMonth = await adminRepo.countEntitiesByDateRange('teacher', startOfLastMonth, startOfThisMonth);
+  const studentsLastMonth = await adminRepo.countEntitiesByDateRange('student', startOfLastMonth, startOfThisMonth);
+
+  return {
+    teacherCount,
+    studentCount,
+    classCount,
+    recentTeachers,
+    chartData: [
+      { 
+        name: "Tháng trước", 
+        students: studentsLastMonth, 
+        teachers: teachersLastMonth 
+      },
+      { 
+        name: "Tháng này", 
+        students: studentsThisMonth, 
+        teachers: teachersThisMonth 
+      }
+    ]
+  };
 };
