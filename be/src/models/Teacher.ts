@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ITeacher extends Document {
   phone: string;
   name: string;
-  // Add other fields as needed, e.g., password hash, etc.
 }
 
 const TeacherSchema: Schema = new Schema({

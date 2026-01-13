@@ -23,7 +23,7 @@ export interface UpdateTeacherDto {
 export interface CreateClassDto {
   className:  string;
   schoolYear: string;
-  teacherId?: string; // Optional
+  teacherId?: string;
 }
 
 export interface UpdateClassDto {
@@ -47,12 +47,10 @@ export interface ImportStudentDto {
   dateOfBirth?:  string | Date;
 }
 
-// DTO tạo 1 học sinh
 export interface CreateStudentDto extends ImportStudentDto {
   classId: string;
 }
 
-// DTO update học sinh
 export interface UpdateStudentDto {
   fullName?:     string;
   classId?:      string;
@@ -60,7 +58,7 @@ export interface UpdateStudentDto {
   gender?:       string;
   dateOfBirth?:  string | Date;
   studentCode?:  string;
-  parentPin?:    string; // Cho phép reset PIN thủ công nếu cần
+  parentPin?:    string;
 }
 
 // --- SUBJECT ---

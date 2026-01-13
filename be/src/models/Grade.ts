@@ -1,4 +1,3 @@
-// This can be used for separate grade updates if needed, but for now, grades are embedded in Student
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IGradeUpdate extends Document {

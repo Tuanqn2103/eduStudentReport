@@ -20,12 +20,10 @@ export const createTeacher = async (req: Request, res: Response) => {
 
 export const getTeachers = async (req: Request, res: Response) => {
   try {
-    // Lấy query param từ URL (Ví dụ: GET /teachers?phoneNumber=0912345678)
     const { phoneNumber } = req.query;
 
     if (phoneNumber) {
       const teacher = await adminService.getTeacherByPhoneService(String(phoneNumber));
-      // Trả về mảng để đồng nhất cấu trúc với get all
       return res.status(200).json(teacher ? [teacher] : []);
     }
 
@@ -39,7 +37,7 @@ export const getTeachers = async (req: Request, res: Response) => {
 export const getTeacherById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const teacher = await adminService.getTeacherByIdService(id);
+    const teacher = await adminService.getTeacherByIdService(id as string);
     return res.status(200).json(teacher);
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy giáo viên' });
@@ -50,9 +48,9 @@ export const getTeacherById = async (req: Request, res: Response) => {
 export const updateTeacher = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const body: UpdateTeacherDto = req.body; // Ép kiểu DTO
-    
-    const updated = await adminService.updateTeacherService(id, body);
+    const body: UpdateTeacherDto = req.body;
+
+    const updated = await adminService.updateTeacherService(id as string, body);
     return res.status(200).json({ message: 'Cập nhật thành công', data: updated });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy giáo viên' });
@@ -63,7 +61,7 @@ export const updateTeacher = async (req: Request, res: Response) => {
 export const deleteTeacher = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await adminService.deleteTeacherService(id);
+    await adminService.deleteTeacherService(id as string);
     return res.status(200).json({ message: 'Xóa giáo viên thành công' });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy giáo viên' });

@@ -39,7 +39,7 @@ export const importStudents = async (req: Request, res: Response) => {
 export const getStudentsByClass = async (req: Request, res: Response) => {
   try {
     const { classId } = req.params;
-    const students = await adminService.getStudentsByClassService(classId);
+    const students = await adminService.getStudentsByClassService(classId as string);
     return res.status(200).json(students);
   } catch (error) {
     return res.status(500).json({ message: 'Lỗi server' });
@@ -49,7 +49,7 @@ export const getStudentsByClass = async (req: Request, res: Response) => {
 export const getStudentById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const student = await adminService.getStudentByIdService(id);
+    const student = await adminService.getStudentByIdService(id as string);
     return res.status(200).json(student);
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy học sinh' });
@@ -62,7 +62,7 @@ export const updateStudent = async (req: Request, res: Response) => {
     const { id } = req.params;
     const body: UpdateStudentDto = req.body; // Ép kiểu DTO
     
-    const updated = await adminService.updateStudentService(id, body);
+    const updated = await adminService.updateStudentService(id as string, body);
     return res.status(200).json({ message: 'Cập nhật thành công', data: updated });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy học sinh' });
@@ -74,7 +74,7 @@ export const updateStudent = async (req: Request, res: Response) => {
 export const deleteStudent = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await adminService.deleteStudentService(id);
+    await adminService.deleteStudentService(id as string);
     return res.status(200).json({ message: 'Xóa học sinh thành công' });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy học sinh' });
@@ -84,6 +84,6 @@ export const deleteStudent = async (req: Request, res: Response) => {
 
 export const resetPin = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await adminService.resetStudentPinService(id);
+  const result = await adminService.resetStudentPinService(id as string);
   return res.status(200).json({ message: "Reset thành công", data: result });
 };

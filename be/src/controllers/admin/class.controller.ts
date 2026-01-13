@@ -26,14 +26,10 @@ export const createClass = async (req: Request, res: Response) => {
 export const getClasses = async (req: Request, res: Response) => {
   try {
     const { className } = req.query;
-
-    // Nếu có param className thì tìm kiếm
     if (className) {
       const classes = await adminService.findClassesByNameService(String(className));
       return res.status(200).json(classes);
     }
-
-    // Không có thì lấy tất cả
     const classes = await adminService.getAllClassesService();
     return res.status(200).json(classes);
   } catch (error) {
@@ -44,7 +40,7 @@ export const getClasses = async (req: Request, res: Response) => {
 export const getClassById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const classInfo = await adminService.getClassByIdService(id);
+    const classInfo = await adminService.getClassByIdService(id as string);
     return res.status(200).json(classInfo);
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp học' });
@@ -55,9 +51,9 @@ export const getClassById = async (req: Request, res: Response) => {
 export const updateClass = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const body: UpdateClassDto = req.body; // Ép kiểu DTO
+    const body: UpdateClassDto = req.body;
     
-    const updated = await adminService.updateClassService(id, body);
+    const updated = await adminService.updateClassService(id as string, body);
     return res.status(200).json({ message: 'Cập nhật lớp thành công', data: updated });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp' });
@@ -68,7 +64,7 @@ export const updateClass = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await adminService.deleteClassService(id);
+    await adminService.deleteClassService(id as string);
     return res.status(200).json({ message: 'Xóa lớp thành công' });
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy lớp' });

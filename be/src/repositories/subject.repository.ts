@@ -7,7 +7,7 @@ export const createSubject = async (data: Prisma.SubjectCreateInput) => {
 
 export const getAllSubjects = async () => {
   return await prisma.subject.findMany({
-    where: { isActive: true }, // Chỉ lấy môn đang hoạt động
+    where: { isActive: true },
     orderBy: { name: 'asc' }
   });
 };
@@ -16,7 +16,6 @@ export const findSubjectByName = async (name: string) => {
   return await prisma.subject.findUnique({ where: { name } });
 };
 
-// Hàm xóa (thực chất là ẩn đi)
 export const toggleSubjectStatus = async (id: string, status: boolean) => {
   return await prisma.subject.update({
     where: { id },

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import * as studentRepo from '../repositories/student.repository'; // Gọi Repository
+import * as studentRepo from '../repositories/student.repository';
 
 export const loginParentService = async (phoneNumber: string, pin: string) => {
   const students = await studentRepo.findStudentsByParentPhone(phoneNumber);

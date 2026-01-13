@@ -17,7 +17,7 @@ export const getChildReports = async (req: Request, res: Response) => {
     const parentPhone = req.user.parentId;
     const { studentId } = req.params;
 
-    const reports = await parentService.getStudentReportsService(studentId, parentPhone);
+    const reports = await parentService.getStudentReportsService(studentId as string, parentPhone);
     return res.status(200).json(reports);
   } catch (error: any) {
     if (error.message === 'FORBIDDEN_CHILD') return res.status(403).json({ message: 'Đây không phải hồ sơ con của bạn' });
@@ -28,7 +28,7 @@ export const getChildReports = async (req: Request, res: Response) => {
 export const getReportDetail = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const report = await parentService.getReportDetailService(id);
+    const report = await parentService.getReportDetailService(id as string);
     return res.status(200).json(report);
   } catch (error: any) {
     if (error.message === 'NOT_FOUND') return res.status(404).json({ message: 'Không tìm thấy bảng điểm' });

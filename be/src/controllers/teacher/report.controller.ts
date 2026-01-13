@@ -11,7 +11,7 @@ export const getStudentReport = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Thiếu kỳ học' });
     }
 
-    const report = await teacherService.getStudentGradeService(studentId, String(term));
+    const report = await teacherService.getStudentGradeService(studentId as string, String(term));
     
     return res.status(200).json(report || null); 
   } catch (error) {
@@ -59,7 +59,7 @@ export const deleteReport = async (req: Request, res: Response) => {
   try {
     const teacherId = req.user?.id;
     const { reportId } = req.params;
-    await teacherService.deleteReportService(teacherId, reportId);
+    await teacherService.deleteReportService(teacherId, reportId as string);
     return res.status(200).json({ message: 'Xóa báo cáo thành công' });
   } catch (error: any) {
     if (error.message === 'FORBIDDEN') return res.status(403).json({ message: 'Không có quyền xóa' });

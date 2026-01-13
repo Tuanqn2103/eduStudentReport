@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import * as subjectService from '../../services/subject.service';
 import { CreateSubjectDto } from '../../dtos/subject.dto';
 
-// 1. Tạo môn học (Admin)
 export const createSubject = async (req: Request, res: Response) => {
   try {
     const body: CreateSubjectDto = req.body;
@@ -16,7 +15,6 @@ export const createSubject = async (req: Request, res: Response) => {
   }
 };
 
-// 2. Lấy danh sách môn (Dùng chung cho cả Admin và Teacher)
 export const getSubjects = async (req: Request, res: Response) => {
   try {
     const subjects = await subjectService.getAllSubjectsService();
