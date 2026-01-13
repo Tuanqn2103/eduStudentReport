@@ -6,7 +6,13 @@ import parentRoutes from './routes/parent.routes';
 const app = express();
 
 // 1. Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://edu-student-report.vercel.app',
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Logger đơn giản (để debug)
