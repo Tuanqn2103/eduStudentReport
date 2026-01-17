@@ -5,7 +5,7 @@ import * as classCtrl from '../controllers/teacher/class.controller';
 import * as studentCtrl from '../controllers/teacher/student.controller';
 import * as reportCtrl from '../controllers/teacher/report.controller';
 import * as subjectController from '../controllers/admin/subject.controller';
-import * as dashboardController from '../controllers/admin/dashboard.controller';
+import * as dashboardController from '../controllers/teacher/dashboard.controller';
 
 import { verifyToken } from '../middlewares/auth.middleware';
 
